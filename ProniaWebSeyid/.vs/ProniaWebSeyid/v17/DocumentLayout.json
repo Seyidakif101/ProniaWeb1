@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2CB7D7AB-1E7E-2AC0-9983-020456C9F47F}|ProniaWebSeyid.csproj|c:\\users\\seyidakif\\desktop\\seyid\\proniawebseyid\\proniawebseyid\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2CB7D7AB-1E7E-2AC0-9983-020456C9F47F}|ProniaWebSeyid.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2CB7D7AB-1E7E-2AC0-9983-020456C9F47F}|ProniaWebSeyid.csproj|c:\\users\\seyidakif\\desktop\\seyid\\proniawebseyid\\proniawebseyid\\conntoller\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2CB7D7AB-1E7E-2AC0-9983-020456C9F47F}|ProniaWebSeyid.csproj|solutionrelative:conntoller\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2CB7D7AB-1E7E-2AC0-9983-020456C9F47F}|ProniaWebSeyid.csproj|c:\\users\\seyidakif\\desktop\\seyid\\proniawebseyid\\proniawebseyid\\adddbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2CB7D7AB-1E7E-2AC0-9983-020456C9F47F}|ProniaWebSeyid.csproj|solutionrelative:adddbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\Conntoller\\HomeController.cs",
+              "RelativeDocumentMoniker": "Conntoller\\HomeController.cs",
+              "ToolTip": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\Conntoller\\HomeController.cs",
+              "RelativeToolTip": "Conntoller\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T20:11:46.907Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AddDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\AddDbContext.cs",
+              "RelativeDocumentMoniker": "AddDbContext.cs",
+              "ToolTip": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\AddDbContext.cs",
+              "RelativeToolTip": "AddDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T20:10:01.708Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\SeyidAkif\\Desktop\\Seyid\\ProniaWebSeyid\\ProniaWebSeyid\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T20:09:50.725Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
