@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ProniaWebSeyid;
+using ProniaWebSeyid.Contexts;
 
 namespace ProniaWebSeyid.Conntoller
 {
