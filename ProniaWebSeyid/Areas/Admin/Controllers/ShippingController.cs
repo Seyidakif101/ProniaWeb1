@@ -23,7 +23,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Shipping shipping)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View();
             }
@@ -37,6 +37,30 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             var shipping = await _context.Shippings.FindAsync(id);
             if (shipping is null) return NotFound();
             _context.Shippings.Remove(shipping);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Update(int id)
+        {
+            var shipping = await _context.Shippings.FindAsync(id);
+            if (shipping is not { }) return NotFound();
+            return View(shipping);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(Shipping shipping)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            var existShipping = await _context.Shippings.FindAsync(shipping.Id);
+            if (existShipping is null) return NotFound();
+            existShipping.Name = shipping.Name;
+            existShipping.Description = shipping.Description;
+            existShipping.ImageUrl = shipping.ImageUrl;
+            _context.Shippings.Update(existShipping);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

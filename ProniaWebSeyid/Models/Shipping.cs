@@ -1,11 +1,17 @@
-﻿namespace ProniaWebSeyid.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProniaWebSeyid.Models
 {
     public class Shipping
     {
+        [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string ImageUrl { get; set; }
+        [MaxLength(50)]
+        [MinLength(3)]
+        public string Name { get; set; }=null!;
+        public string? Description { get; set; }
+        [Requeired]
+        public string ImageUrl { get; set; }=null!;
 
     }
 }

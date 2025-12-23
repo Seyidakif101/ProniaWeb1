@@ -28,7 +28,7 @@
                         <td><img src="~/assets/images/website-images/@shipping.ImageUrl"width="40" height="40" alt="Alternate Text"/> </td>
                         <td>
                             <a asp-action="Delete" asp-route-id="@shipping.Id" class="btn btn-danger">Delete</a>
-                            <a class="btn btn-warning">Update</a>
+                            <a asp-action="Update" asp-route-id="@shipping.Id" class="btn btn-warning">Update</a>
 
                         </td>
                     </tr>

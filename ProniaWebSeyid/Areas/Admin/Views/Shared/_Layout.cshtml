@@ -207,15 +207,15 @@
 			<nav class="sidebar sidebar-offcanvas" id="sidebar">
 				<ul class="nav">
 					<li class="nav-item">
-						<a class="nav-link" href="index.html">
+						<a asp-controller ="Dashboard" asp-action="Index" class="nav-link">
 							<i class="mdi mdi-home menu-icon"></i>
 							<span class="menu-title">Dashboard</span>
 						</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+						<a asp-controller="Shipping" asp-action="Index" class="nav-link" >
 							<i class="mdi mdi-circle-outline menu-icon"></i>
-							<span class="menu-title">UI Elements</span>
+							<span class="menu-title">Shipping</span>
 							<i class="menu-arrow"></i>
 						</a>
 						<div class="collapse" id="ui-basic">
