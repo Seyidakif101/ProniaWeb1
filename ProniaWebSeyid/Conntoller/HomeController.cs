@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ProniaWebSeyid.Contexts;
-
-namespace ProniaWebSeyid.Conntoller
+﻿namespace ProniaWebSeyid.Conntoller
 {
     public class HomeController : Controller
     {
-        private readonly AddDbContext _context;
-        public HomeController(AddDbContext context)
+        private readonly AppDbContext _context;
+        public HomeController(AppDbContext context)
         {
             _context = context;
         }

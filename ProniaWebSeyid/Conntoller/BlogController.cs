@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace ProniaWebSeyid.Conntoller
+﻿namespace ProniaWebSeyid.Conntoller
 {
     public class BlogController : Controller
     {

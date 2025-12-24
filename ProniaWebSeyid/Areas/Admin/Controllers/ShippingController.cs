@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ProniaWebSeyid.Contexts;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using ProniaWebSeyid.Models;
-
-namespace ProniaWebSeyid.Areas.Admin.Controllers
+﻿namespace ProniaWebSeyid.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class ShippingController(AddDbContext _context) : Controller
+    [AutoValidateAntiforgeryToken]
+    public class ShippingController(AppDbContext _context) : Controller
     {
 
         public async Task<IActionResult> Index()
