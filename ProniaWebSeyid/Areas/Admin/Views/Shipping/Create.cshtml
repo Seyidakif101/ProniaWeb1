@@ -1,7 +1,7 @@
-﻿@model Shipping
+﻿@model ShippingCreateVM
 <div class="container">
     <div class="row">
-<form method="post" asp-action="Create" asp-controller="Shipping">
+        <form method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label for="name">Name</label>
         <input asp-for="Name" class="form-control" id="name" placeholder="Name">
@@ -13,9 +13,9 @@
 				<span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label for="imageUrl">ImageUrl</label>
-        <input asp-for="ImageUrl" class="form-control" id="imageUrl" placeholder="ImageUrl">
-				<span asp-validation-for="ImageUrl" class="text-danger"></span>
+        <label for="image">Image</label>
+        <input asp-for="Image" class="form-control" id="image" placeholder="Image">
+				<span asp-validation-for="Image" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>

@@ -1,10 +1,12 @@
-﻿namespace ProniaWebSeyid.Conntoller
+﻿
+namespace ProniaWebSeyid.Conntoller
 {
-    public class ShopController : Controller
+    public class ShopController(AppDbContext _context) : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            return View();
+            var products = await _context.Products.ToListAsync();
+            return View(products);
         }
     }
 }

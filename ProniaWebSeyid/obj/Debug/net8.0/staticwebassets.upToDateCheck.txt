@@ -1069,3 +1069,9 @@ wwwroot\admin\assets\vendors\ti-icons\fonts\themify.svg
 wwwroot\admin\assets\vendors\ti-icons\fonts\themify.ttf
 wwwroot\admin\assets\vendors\ti-icons\fonts\themify.woff
 wwwroot\admin\assets\vendors\typeahead.js\typeahead.bundle.min.js
+wwwroot\assets\images\website-images\e1bfdfe3-142c-447e-8fae-d880ac5855ef1-2-120x120.webp
+wwwroot\assets\images\website-images\0de25142-b4c4-4be4-b9b9-1ccfd84da71e2-1-370x270.webp
+wwwroot\assets\images\website-images\4e5232eb-4b99-45c6-ae19-e9493350b2b12-1-370x270.webp
+wwwroot\assets\images\website-images\90e6c4bf-ab51-4587-a017-69138a0aab061-1-524x617.png
+wwwroot\assets\images\website-images\b132eaf7-1e3e-420d-bd29-9da83fba48ff1-1-120x120.webp
+wwwroot\assets\images\website-images\20e8e301-cd2e-4430-8dce-6b3aed54681b1-1-270x300.jpg
