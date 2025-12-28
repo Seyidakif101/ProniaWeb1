@@ -90,5 +90,11 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> Info(int id)
+        {
+            var shipping = await _context.Shippings.FindAsync(id);
+            if (shipping is null) return NotFound();
+            return View(shipping);
+        }
     }
 }

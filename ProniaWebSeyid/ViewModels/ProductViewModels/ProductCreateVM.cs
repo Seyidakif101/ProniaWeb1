@@ -12,6 +12,7 @@
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
         public int CategoryId { get; set; }
+        public List<int> TagIds { get; set; }
         [Required]
         [Range(0,5)]
         public int ReytingCount {  get; set; }

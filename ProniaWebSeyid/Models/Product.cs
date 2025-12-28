@@ -19,6 +19,7 @@ namespace ProniaWebSeyid.Models
         public string? MainImageUrl { get; set; }
         public string? HoverImageUrl { get; set; }
 
-        public ICollection<ProductImage>? ProductImages { get; set; }
+        public ICollection<ProductImage> ProductImages { get; set; } = [];
+        public ICollection<ProductTag> ProductTags { get; set; } = [];
     }
 }

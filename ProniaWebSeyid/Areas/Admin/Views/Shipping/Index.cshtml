@@ -27,8 +27,9 @@
                         <td>@shipping.Description</td>
                         <td><img src="~/assets/images/website-images/@shipping.ImageUrl"width="40" height="40" alt="Alternate Text"/> </td>
                         <td>
-                            <a asp-action="Delete" asp-route-id="@shipping.Id" class="btn btn-danger deleteBtn">Delete</a>
-                            <a asp-action="Update" asp-route-id="@shipping.Id" class="btn btn-warning">Update</a>
+                            <a asp-action="Delete" asp-route-id="@shipping.Id" class="btn btn-danger deleteBtn"><i class="fa-regular fa-trash-can"></i></a>
+                            <a asp-action="Update" asp-route-id="@shipping.Id" class="btn btn-warning"><i class="fa-regular fa-pen-to-square"></i></a>
+                            <a asp-action="Info" asp-route-id="@shipping.Id" class="btn btn-primary"><i class="fa-regular fa-file-lines"></i></a>
 
                         </td>
                     </tr>

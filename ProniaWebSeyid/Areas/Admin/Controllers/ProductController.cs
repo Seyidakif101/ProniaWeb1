@@ -1,4 +1,7 @@
-﻿namespace ProniaWebSeyid.Areas.Admin.Controllers
+﻿using ProniaWebSeyid.Helpers;
+using System.Runtime.Serialization;
+
+namespace ProniaWebSeyid.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AutoValidateAntiforgeryToken]
@@ -7,13 +10,24 @@
 
         public async Task<IActionResult> Index()
         {
-            var products = await _context.Products.Include(x => x.Category).ToListAsync();
+            var products = await _context.Products.Include(x => x.Category).Select(product=>new ProductGetVM()
+            {
+                Id= product.Id,
+                Name= product.Name,
+                Description= product.Description,
+                CategoryName=product.Category.Name,
+                Price= product.Price,
+                ReytingCount=product.ReytingCount,
+                MainImageUrl =product.MainImageUrl,
+                HoverImageUrl=product.HoverImageUrl
+
+            }).ToListAsync();
             return View(products);
         }
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await ViewsBagCategoryId();
+            await ViewsBagItem();
             return View();
         }
         [HttpPost]
@@ -22,38 +36,49 @@
 
             if (!ModelState.IsValid)
             {
-                await ViewsBagCategoryId();
+                await ViewsBagItem();
                 return View(vm);
             }
             var isExistingCategory = await _context.Categories.AnyAsync(c => c.Id == vm.CategoryId);
             if (!isExistingCategory)
             {
-                await ViewsBagCategoryId();
+                await ViewsBagItem();
                 ModelState.AddModelError("CategoryId", "Secdiyiniz Kateqoriya yoxdu!");
                 return View(vm);
+            }
+            foreach(var tagId in vm.TagIds)
+            {
+                var isExistTag= await _context.Tags.AnyAsync(x=>x.Id== tagId);
+                await ViewsBagItem();
+                if (!isExistTag)
+                {
+
+                ModelState.AddModelError("TagIds", "Bele bir tag yoxdur");
+                return View(vm);
+                }
             }
             if (vm.ReytingCount > 6 || vm.ReytingCount < 0)
             {
                 ModelState.AddModelError("ReytingCount", "Reyting0-5 arasi olmalidi!");
                 return View(vm);
             }
-            
-            if (!vm.MainImage.ContentType.Contains("image"))
+
+            if (!vm.MainImage.CheckType())
             {
                 ModelState.AddModelError("MainImage", "File sekil formatinda olmalidir!");
                 return View(vm);
             }
-            if(vm.MainImage.Length > 2 * 1024 * 1024)
+            if (vm.MainImage.CheckSize(2))
             {
                 ModelState.AddModelError("MainImage", "File olcusu maksimum 2MB ola biler!");
                 return View(vm);
             }
-            if (!vm.HoverImage.ContentType.Contains("image"))
+            if (!vm.HoverImage.CheckType())
             {
                 ModelState.AddModelError("HoverImage", "File sekil formatinda olmalidir!");
                 return View(vm);
             }
-            if (vm.HoverImage.Length > 2 * 1024 * 1024)
+            if (vm.HoverImage.CheckSize(2))
             {
                 ModelState.AddModelError("HoverImage", "File olcusu maksimum 2MB ola biler!");
                 return View(vm);
@@ -77,9 +102,18 @@
                 MainImageUrl = mainImageFileName,
                 HoverImageUrl = hoverImageFileName,
                 ReytingCount= vm.ReytingCount,
-
+                ProductTags = []
             };
+            foreach (var tagId in vm.TagIds)
+            {
+                ProductTag productTag = new()
+                {
+                    TagId = tagId,
+                    Product = product
+                };
+                product.ProductTags.Add(productTag);
 
+            }
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -87,32 +121,110 @@
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.Include(x=>x.ProductTags).SingleOrDefaultAsync(x=>x.Id==id);
             if (product is null) return NotFound();
-            await ViewsBagCategoryId();
-            return View(product);
+            await ViewsBagItem();
+            ProductUpdateVM vm = new ProductUpdateVM()
+            {
+                Id = product.Id,
+                Name= product.Name,
+                Description= product.Description,
+                Price= product.Price,
+                CategoryId= product.CategoryId,
+                MainImageUrl= product.MainImageUrl,
+                HoverImageUrl= product.HoverImageUrl,
+                TagIds = product.ProductTags.Select(x => x.TagId).ToList()
+            };
+            return View(vm);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Product product)
+        public async Task<IActionResult> Update(ProductUpdateVM vm)
         {
             if (!ModelState.IsValid)
             {
-                await ViewsBagCategoryId();
-                return View(product);
+                await ViewsBagItem();
+                return View(vm);
             }
 
-            var existProduct = await _context.Products.FindAsync(product.Id);
+            var existProduct = await _context.Products.Include(x=>x.ProductTags).FirstOrDefaultAsync(x=>x.Id==vm.Id);
             if (existProduct is null) return NotFound();
-            var isExistingCategory = await _context.Categories.AnyAsync(c => c.Id == product.CategoryId);
+            var isExistingCategory = await _context.Categories.AnyAsync(c => c.Id == vm.CategoryId);
             if (!isExistingCategory)
             {
                 ModelState.AddModelError("CategoryId", "Secdiyiniz Kateqoriya yoxdu!");
-                return View(product);
+                return View(vm);
             }
-            existProduct.Name = product.Name;
-            existProduct.Price = product.Price;
-            //existProduct.ImageUrl = product.ImageUrl;
-            existProduct.CategoryId = product.CategoryId;
+            foreach (var tagId in vm.TagIds)
+            {
+                var isExistTag = await _context.Tags.AnyAsync(x => x.Id == tagId);
+                await ViewsBagItem();
+                if (!isExistTag)
+                {
+
+                    ModelState.AddModelError("TagIds", "Bele bir tag yoxdur");
+                    return View(vm);
+                }
+            }
+            if (vm.ReytingCount > 6 || vm.ReytingCount < 0)
+            {
+                ModelState.AddModelError("ReytingCount", "Reyting0-5 arasi olmalidi!");
+                return View(vm);
+            }
+
+            if (!vm.MainImage?.CheckType() ?? false)
+            {
+                ModelState.AddModelError("MainImage", "File sekil formatinda olmalidir!");
+                return View(vm);
+            }
+            if (vm.MainImage?.CheckSize(2) ?? false)
+            {
+                ModelState.AddModelError("MainImage", "File olcusu maksimum 2MB ola biler!");
+                return View(vm);
+            }
+            if (!vm.HoverImage?.CheckType() ?? false)
+            {
+                ModelState.AddModelError("HoverImage", "File sekil formatinda olmalidir!");
+                return View(vm);
+            }
+            if (vm.HoverImage?.CheckSize(2) ?? false)
+            {
+                ModelState.AddModelError("HoverImage", "File olcusu maksimum 2MB ola biler!");
+                return View(vm);
+            }
+            existProduct.Name = vm.Name;
+            existProduct.Description = vm.Description;
+            existProduct.CategoryId = vm.CategoryId;
+            existProduct.Price = vm.Price;
+            existProduct.ProductTags = [];
+            foreach(var tagId in vm.TagIds)
+            {
+                ProductTag productTag = new()
+                {
+                    TagId = tagId,
+                    ProductId = existProduct.Id
+                };
+                existProduct.ProductTags.Add(productTag);
+            }
+
+
+            string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
+            if(vm.MainImage is { })
+            {
+                string newMainImage = await vm.MainImage.SaveFileAsync(folderPath);
+                string existMainImage =Path.Combine(folderPath,existProduct.MainImageUrl);
+
+                ExtensionMethods.DeleteFile(existMainImage);
+                existProduct.MainImageUrl = newMainImage;
+            }
+            if (vm.HoverImage is { })
+            {
+                string newHoverImage = await vm.HoverImage.SaveFileAsync(folderPath);
+                string existHoverImage = Path.Combine(folderPath,existProduct.HoverImageUrl);
+
+                ExtensionMethods.DeleteFile(existHoverImage);
+                existProduct.HoverImageUrl = newHoverImage;
+            }
+           
             _context.Products.Update(existProduct);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -140,10 +252,31 @@
 
             return RedirectToAction(nameof(Index));
         }
-        private async Task ViewsBagCategoryId()
+        public async Task<IActionResult> Info(int id)
+        {
+            var product = await _context.Products.Include(x => x.Category).Select(product => new ProductGetVM()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                CategoryName = product.Category.Name,
+                Price = product.Price,
+                ReytingCount = product.ReytingCount,
+                MainImageUrl = product.MainImageUrl,
+                HoverImageUrl = product.HoverImageUrl,
+                TagNames=product.ProductTags.Select(x=>x.Tag.Name).ToList()
+
+            }).FirstOrDefaultAsync(x=>x.Id==id);
+            if (product is null) return NotFound();
+            return View(product);
+        }
+        private async Task ViewsBagItem()
         {
             var categories = await _context.Categories.ToListAsync();
             ViewBag.Categories = categories;
+
+            var tags = await _context.Tags.ToListAsync();
+            ViewBag.Tags = tags;
         }
     }
 }
