@@ -83,15 +83,23 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 ModelState.AddModelError("HoverImage", "File olcusu maksimum 2MB ola biler!");
                 return View(vm);
             }
-            string mainImageFileName = Guid.NewGuid().ToString() + vm.MainImage.FileName;
-            string mainImagePath = Path.Combine(_environment.WebRootPath,"assets","images","website-images", mainImageFileName);
-            using FileStream mainStream = new(mainImagePath, FileMode.Create);
-            await vm.MainImage.CopyToAsync(mainStream);
+            string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
 
-            string hoverImageFileName = Guid.NewGuid().ToString() + vm.HoverImage.FileName;
-            string hoverImagePath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images", hoverImageFileName);
-            using FileStream hoverStream = new(hoverImagePath, FileMode.Create);
-            await vm.HoverImage.CopyToAsync(hoverStream);
+            foreach(var image in vm.Images)
+            {
+                if (!image.CheckType())
+                {
+                    ModelState.AddModelError("Images", "File sekil formatinda olmalidir!");
+                    return View(vm);
+                }
+                if (image.CheckSize(2))
+                {
+                    ModelState.AddModelError("Images", "File olcusu maksimum 2MB ola biler!");
+                    return View(vm);
+                }
+            }
+            string mainImageFileName = await vm.MainImage.SaveFileAsync(folderPath);
+            string hoverImageFileName = await vm.HoverImage.SaveFileAsync(folderPath);
 
             Product product = new()
             {
@@ -102,8 +110,19 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 MainImageUrl = mainImageFileName,
                 HoverImageUrl = hoverImageFileName,
                 ReytingCount= vm.ReytingCount,
-                ProductTags = []
+                ProductTags = [],
+                ProductImages = []
             };
+            foreach(var image in vm.Images)
+            {
+                string ImagesFileName= await image.SaveFileAsync(folderPath);
+                ProductImage productImage = new()
+                {
+                    ImageUrl = ImagesFileName,
+                    Product = product
+                };
+                product.ProductImages.Add(productImage);    
+            }
             foreach (var tagId in vm.TagIds)
             {
                 ProductTag productTag = new()
@@ -121,7 +140,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            var product = await _context.Products.Include(x=>x.ProductTags).SingleOrDefaultAsync(x=>x.Id==id);
+            var product = await _context.Products.Include(x=>x.ProductTags).Include(i=>i.ProductImages).SingleOrDefaultAsync(x=>x.Id==id);
             if (product is null) return NotFound();
             await ViewsBagItem();
             ProductUpdateVM vm = new ProductUpdateVM()
@@ -133,7 +152,9 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 CategoryId= product.CategoryId,
                 MainImageUrl= product.MainImageUrl,
                 HoverImageUrl= product.HoverImageUrl,
-                TagIds = product.ProductTags.Select(x => x.TagId).ToList()
+                TagIds = product.ProductTags.Select(x => x.TagId).ToList(),
+                ImagesUrl=product.ProductImages.Select(x => x.ImageUrl).ToList(),
+                ImagesUrlIds = product.ProductImages.Select(x => x.Id).ToList()
             };
             return View(vm);
         }
@@ -146,7 +167,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 return View(vm);
             }
 
-            var existProduct = await _context.Products.Include(x=>x.ProductTags).FirstOrDefaultAsync(x=>x.Id==vm.Id);
+            var existProduct = await _context.Products.Include(x=>x.ProductTags).Include(i => i.ProductImages).FirstOrDefaultAsync(x=>x.Id==vm.Id);
             if (existProduct is null) return NotFound();
             var isExistingCategory = await _context.Categories.AnyAsync(c => c.Id == vm.CategoryId);
             if (!isExistingCategory)
@@ -205,7 +226,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 };
                 existProduct.ProductTags.Add(productTag);
             }
-
+            
 
             string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
             if(vm.MainImage is { })
@@ -224,7 +245,28 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 ExtensionMethods.DeleteFile(existHoverImage);
                 existProduct.HoverImageUrl = newHoverImage;
             }
-           
+            var existImages = existProduct.ProductImages.ToList();
+            foreach (var image in existImages)
+            {
+                var existImageId = vm.ImagesUrlIds?.Any(x => x == image.Id) ?? false;
+                if (!existImageId)
+                {
+                    string deletableImageUrl = Path.Combine(folderPath, image.ImageUrl);
+                    ExtensionMethods.DeleteFile(deletableImageUrl);
+                    existProduct.ProductImages.Remove(image);
+                }
+            }
+            foreach (var image in vm.Images ?? [])
+            {
+                string ImageFileUrl = await image.SaveFileAsync(folderPath);
+                ProductImage productImage = new()
+                {
+                    ImageUrl = ImageFileUrl,
+                    ProductId = existProduct.Id,
+                };
+                existProduct.ProductImages.Add(productImage);
+            }
+
             _context.Products.Update(existProduct);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -232,7 +274,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.Include(x=>x.ProductImages).FirstOrDefaultAsync();
             if (product is null) return NotFound();
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
@@ -241,15 +283,13 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             string hoverImageUrl = Path.Combine(folderUrl, product.HoverImageUrl);
             string mainImageUrl = Path.Combine(folderUrl, product.MainImageUrl);
 
-            if (System.IO.File.Exists(hoverImageUrl))
+            ExtensionMethods.DeleteFile(hoverImageUrl);
+            ExtensionMethods.DeleteFile(mainImageUrl);
+            foreach (var image in product.ProductImages)
             {
-                System.IO.File.Delete(hoverImageUrl);
+                string imageUrl=Path.Combine(folderUrl, image.ImageUrl);
+                ExtensionMethods.DeleteFile(imageUrl);
             }
-            if (System.IO.File.Exists(mainImageUrl))
-            {
-                System.IO.File.Delete(mainImageUrl);
-            }
-
             return RedirectToAction(nameof(Index));
         }
         public async Task<IActionResult> Info(int id)
@@ -264,7 +304,8 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 ReytingCount = product.ReytingCount,
                 MainImageUrl = product.MainImageUrl,
                 HoverImageUrl = product.HoverImageUrl,
-                TagNames=product.ProductTags.Select(x=>x.Tag.Name).ToList()
+                TagNames=product.ProductTags.Select(x=>x.Tag.Name).ToList(),
+                ImagesUrl=product.ProductImages.Select(x=>x.ImageUrl).ToList()
 
             }).FirstOrDefaultAsync(x=>x.Id==id);
             if (product is null) return NotFound();

@@ -16,8 +16,8 @@
         [Required]
         [Range(0,5)]
         public int ReytingCount {  get; set; }
-        public IFormFile MainImage { get; set; }
-        public IFormFile HoverImage { get; set; }
-        public List<IFormFile>? Images { get;set; }
+        public IFormFile MainImage { get; set; }=null!;
+        public IFormFile HoverImage { get; set; } = null!;
+        public List<IFormFile> Images { get; set; } = [];
     }
 }

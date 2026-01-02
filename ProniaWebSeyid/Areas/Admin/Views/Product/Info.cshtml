@@ -40,6 +40,16 @@
 
                             </td>
                         </tr>
+                        <tr>
+                            <th>Images</th>
+                            <td>
+                                @foreach (var image in Model.ImagesUrl)
+                                {
+                                    <img src="~/assets/images/website-images/@image" class="img-fluid rounded mb-3" />
+                                }
+
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>

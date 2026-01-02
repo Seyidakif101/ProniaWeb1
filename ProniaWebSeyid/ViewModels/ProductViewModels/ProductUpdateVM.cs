@@ -21,6 +21,8 @@
         public IFormFile? HoverImage { get; set; }
         public string? MainImageUrl { get; set; }
         public string? HoverImageUrl { get; set; }
-        public List<IFormFile>? Images { get; set; }
+        public ICollection<IFormFile>? Images { get; set; } = [];
+        public List<string>? ImagesUrl { get; set; } = [];
+        public List<int>? ImagesUrlIds { get; set; } = [];
     }
 }
