@@ -1,6 +1,8 @@
-﻿namespace ProniaWebSeyid.Contexts
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+namespace ProniaWebSeyid.Contexts
 {
-    public class AppDbContext:DbContext
+    public class AppDbContext:IdentityDbContext<AppUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

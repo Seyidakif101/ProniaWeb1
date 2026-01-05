@@ -129,7 +129,10 @@
                                                     <a class="dropdown-item" href="my-account.html">My account</a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="login-register.html">Login | Register</a>
+                                                    <a asp-controller="Account" asp-action="Register" class="dropdown-item" >Register</a>
+                                                </li>
+                                                <li>
+                                                    <a asp-controller="Account" asp-action="Login"  class="dropdown-item" >Login</a>
                                                 </li>
                                             </ul>
                                         </li>
