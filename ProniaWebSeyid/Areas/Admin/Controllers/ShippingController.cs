@@ -1,5 +1,7 @@
-﻿using ProniaWebSeyid.Models;
+﻿using ProniaWebSeyid.Helpers;
+using ProniaWebSeyid.Models;
 using ProniaWebSeyid.ViewModels.ShippingViewModels;
+using ProniaWebSeyid.ViewModels.TagViewModels;
 
 namespace ProniaWebSeyid.Areas.Admin.Controllers
 {
@@ -10,7 +12,13 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var shippings = await _context.Shippings.ToListAsync();
+            var shippings = await _context.Shippings.Select(shipping => new ShippingGetVM()
+            {
+                Id = shipping.Id,
+                Name = shipping.Name,
+                Description = shipping.Description,
+                ImageUrl = shipping.ImageUrl
+            }).ToListAsync();
             return View(shippings);
         }
         [HttpGet]
@@ -25,14 +33,14 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             {
                 return View();
             }
-            if (!svm.Image.ContentType.Contains("image"))
+            if (!svm.Image?.CheckType() ?? false)
             {
-                ModelState.AddModelError("Image", "File sekil formatinda olmalidir!");
+                ModelState.AddModelError("MainImage", "File sekil formatinda olmalidir!");
                 return View(svm);
             }
-            if (svm.Image.Length > 2 * 1024 * 1024)
+            if (svm.Image?.CheckSize(2) ?? false)
             {
-                ModelState.AddModelError("Image", "File olcusu maksimum 2MB ola biler!");
+                ModelState.AddModelError("MainImage", "File olcusu maksimum 2MB ola biler!");
                 return View(svm);
             }
             string ImageFileName = Guid.NewGuid().ToString() + svm.Image.FileName;
@@ -72,20 +80,46 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
         {
             var shipping = await _context.Shippings.FindAsync(id);
             if (shipping is not { }) return NotFound();
-            return View(shipping);
+            ShippingUpdateVM vm = new ShippingUpdateVM
+            {
+                Id = shipping.Id,
+                Name = shipping.Name,
+                Description = shipping.Description,
+                ImageUrl = shipping.ImageUrl
+            };
+            return View(vm);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Shipping shipping)
+        public async Task<IActionResult> Update(ShippingUpdateVM vm)
         {
             if (!ModelState.IsValid)
             {
                 return View();
             }
-            var existShipping = await _context.Shippings.FindAsync(shipping.Id);
+            var existShipping = await _context.Shippings.FindAsync(vm.Id);
             if (existShipping is null) return NotFound();
-            existShipping.Name = shipping.Name;
-            existShipping.Description = shipping.Description;
-            existShipping.ImageUrl = shipping.ImageUrl;
+            if (!vm.Image?.CheckType() ?? false)
+            {
+                ModelState.AddModelError("MainImage", "File sekil formatinda olmalidir!");
+                return View(vm);
+            }
+            if (vm.Image?.CheckSize(2) ?? false)
+            {
+                ModelState.AddModelError("MainImage", "File olcusu maksimum 2MB ola biler!");
+                return View(vm);
+            }
+            existShipping.Name = vm.Name;
+            existShipping.Description = vm.Description;
+            existShipping.ImageUrl = vm.ImageUrl;
+            string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
+            if (vm.Image is { })
+            {
+                string newImage = await vm.Image.SaveFileAsync(folderPath);
+                string existImage = Path.Combine(folderPath, existShipping.ImageUrl);
+
+                ExtensionMethods.DeleteFile(existImage);
+                existShipping.ImageUrl = newImage;
+            }
             _context.Shippings.Update(existShipping);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

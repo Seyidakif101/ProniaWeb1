@@ -1,4 +1,6 @@
-﻿namespace ProniaWebSeyid.Conntoller
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace ProniaWebSeyid.Conntoller
 {
     public class HomeController : Controller
     {
@@ -7,6 +9,7 @@
         {
             _context = context;
         }
+        [Authorize]
         public IActionResult Index()
         {
             var shippings = _context.Shippings.ToList();

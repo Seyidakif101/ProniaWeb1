@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Reflection;
 
 namespace ProniaWebSeyid.Contexts
 {
@@ -6,6 +7,11 @@ namespace ProniaWebSeyid.Contexts
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
+        }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            base.OnModelCreating(builder);
         }
         public DbSet<Shipping> Shippings { get; set; }
         public DbSet<Category> Categories { get; set; }

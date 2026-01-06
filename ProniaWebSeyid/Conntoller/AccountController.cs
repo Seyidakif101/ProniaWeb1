@@ -45,6 +45,9 @@ namespace ProniaWebSeyid.Conntoller
                 }
                 return View(vm);
             }
+
+            await _signInManager.SignInAsync(appUser, false);
+
             return RedirectToAction("Index", "Home");
         }
         public IActionResult Login()
@@ -70,7 +73,7 @@ namespace ProniaWebSeyid.Conntoller
                 ModelState.AddModelError("", "Email ya da password  Sehdi");
                 return View(vm);
             }
-            await _signInManager.SignInAsync(user, false);
+            await _signInManager.SignInAsync(user, vm.IsRemember);
             return RedirectToAction("Index", "Home");
         }
         [HttpPost]
