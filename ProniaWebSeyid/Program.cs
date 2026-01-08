@@ -14,6 +14,7 @@ namespace ProniaWebSeyid
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IBasketService, BasketService>();
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));

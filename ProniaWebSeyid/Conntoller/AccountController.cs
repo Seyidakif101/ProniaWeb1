@@ -85,6 +85,10 @@ namespace ProniaWebSeyid.Conntoller
                 return View(vm);
             }
             await _signInManager.SignInAsync(user, vm.IsRemember);
+            if(!string.IsNullOrWhiteSpace(vm.ReturnUrl))
+            {
+                return Redirect(vm.ReturnUrl);
+            }
             return RedirectToAction("Index", "Home");
         }
         [HttpPost]

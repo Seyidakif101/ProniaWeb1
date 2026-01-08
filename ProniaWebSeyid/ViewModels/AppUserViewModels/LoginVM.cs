@@ -8,5 +8,6 @@
         [Required, DataType(DataType.Password), MinLength(6)]
         public string Password { get; set; } = string.Empty;
         public bool IsRemember { get; set; }
+        public string? ReturnUrl { get; set; }
     }
 }

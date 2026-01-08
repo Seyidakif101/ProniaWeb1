@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProniaWebSeyid.Contexts;
 
@@ -11,9 +12,11 @@ using ProniaWebSeyid.Contexts;
 namespace ProniaWebSeyid.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AddDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260108171339_BasketItem")]
+    partial class BasketItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
