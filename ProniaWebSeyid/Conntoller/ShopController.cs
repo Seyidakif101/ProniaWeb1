@@ -1,7 +1,10 @@
 ﻿
+using ProniaWebSeyid.Abstraction;
+using System.Threading.Tasks;
+
 namespace ProniaWebSeyid.Conntoller
 {
-    public class ShopController(AppDbContext _context) : Controller
+    public class ShopController(AppDbContext _context, IEmailService _emailService) : Controller
     {
         public async Task<IActionResult> IndexAsync()
         {
@@ -25,7 +28,13 @@ namespace ProniaWebSeyid.Conntoller
             }).FirstOrDefaultAsync(x => x.Id == id);
             if (product == null) return NotFound();
             return View(product);
-           
+
+        }
+        public async Task<IActionResult> SendTestEmail()
+        {
+            await _emailService.SendEmailAsync("azimovseyidakif7@gmail.com", "Test Email", "<h1>This is a test email from ProniaWebSeyid</h1>");
+            return Ok("OK");
+
         }
     }
 }
