@@ -27,20 +27,20 @@
 							<div class="swiper-wrapper">
 
 								<div class="swiper-slide">
-									<a href="~/assets/images/website-images/@Model.MainImageUrl"
+									<a href="@Model.MainImageUrl"
 									   class="single-img gallery-popup">
 										<img class="img-full"
-											 src="~/assets/images/website-images/@Model.HoverImageUrl"
+											 src="@Model.HoverImageUrl"
 											 alt="Product Image" />
 									</a>
 								</div>
 								@foreach (var imageUrl in Model.ImagesUrl)
 								{
 									<div class="swiper-slide">
-										<a href="~/assets/images/website-images/@imageUrl"
+										<a href="@imageUrl"
 										   class="single-img gallery-popup">
 											<img class="img-full"
-												 src="~/assets/images/website-images/@imageUrl"
+												 src="@imageUrl"
 												 alt="Product Image" />
 										</a>
 									</div>
@@ -54,19 +54,19 @@
 								<div class="swiper-wrapper">
 									<a href="#" class="swiper-slide">
 										<img class="img-full"
-											 src="~/assets/images/website-images/@Model.MainImageUrl"
+											 src="@Model.MainImageUrl"
 											 alt="Product Thumnail" />
 									</a>
 									<a href="#" class="swiper-slide">
 										<img class="img-full"
-											 src="~/assets/images/website-images/@Model.HoverImageUrl"
+											 src="@Model.HoverImageUrl"
 											 alt="Product Thumnail" />
 									</a>
 									@foreach (var imageUrl in Model.ImagesUrl)
 									{
 									  <a href="#" class="swiper-slide">
 										<img class="img-full"
-											 src="~/assets/images/website-images/@imageUrl"
+											 src="@imageUrl"
 											 alt="Product Thumnail" />
 									  </a>
 									}

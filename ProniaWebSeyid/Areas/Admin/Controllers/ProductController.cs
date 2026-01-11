@@ -1,11 +1,13 @@
-﻿using ProniaWebSeyid.Helpers;
+﻿using CloudinaryDotNet;
+using ProniaWebSeyid.Abstraction;
+using ProniaWebSeyid.Helpers;
 using System.Runtime.Serialization;
 
 namespace ProniaWebSeyid.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AutoValidateAntiforgeryToken]
-    public class ProductController(AppDbContext _context,IWebHostEnvironment _environment) : Controller
+    public class ProductController(AppDbContext _context,IWebHostEnvironment _environment,ICloudinaryService _cloudinaryService) : Controller
     {
 
         public async Task<IActionResult> Index()
@@ -83,7 +85,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 ModelState.AddModelError("HoverImage", "File olcusu maksimum 2MB ola biler!");
                 return View(vm);
             }
-            string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
+            //string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
 
             foreach(var image in vm.Images)
             {
@@ -98,8 +100,8 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                     return View(vm);
                 }
             }
-            string mainImageFileName = await vm.MainImage.SaveFileAsync(folderPath);
-            string hoverImageFileName = await vm.HoverImage.SaveFileAsync(folderPath);
+            string hoverImageFileName = await _cloudinaryService.FileUploadAsync(vm.HoverImage);    
+            string mainImageFileName = await _cloudinaryService.FileUploadAsync(vm.MainImage);  
 
             Product product = new()
             {
@@ -115,7 +117,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             };
             foreach(var image in vm.Images)
             {
-                string ImagesFileName= await image.SaveFileAsync(folderPath);
+                string ImagesFileName= await _cloudinaryService.FileUploadAsync(image);
                 ProductImage productImage = new()
                 {
                     ImageUrl = ImagesFileName,
@@ -228,21 +230,17 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             }
             
 
-            string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
+            //string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
             if(vm.MainImage is { })
             {
-                string newMainImage = await vm.MainImage.SaveFileAsync(folderPath);
-                string existMainImage =Path.Combine(folderPath,existProduct.MainImageUrl);
-
-                ExtensionMethods.DeleteFile(existMainImage);
+                string newMainImage = await _cloudinaryService.FileUploadAsync(vm.MainImage);
+                await _cloudinaryService.FileDeleteAsync(existProduct.MainImageUrl);
                 existProduct.MainImageUrl = newMainImage;
             }
             if (vm.HoverImage is { })
             {
-                string newHoverImage = await vm.HoverImage.SaveFileAsync(folderPath);
-                string existHoverImage = Path.Combine(folderPath,existProduct.HoverImageUrl);
-
-                ExtensionMethods.DeleteFile(existHoverImage);
+                string newHoverImage = await _cloudinaryService.FileUploadAsync(vm.HoverImage);
+                await _cloudinaryService.FileDeleteAsync(existProduct.HoverImageUrl);
                 existProduct.HoverImageUrl = newHoverImage;
             }
             var existImages = existProduct.ProductImages.ToList();
@@ -251,14 +249,13 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 var existImageId = vm.ImagesUrlIds?.Any(x => x == image.Id) ?? false;
                 if (!existImageId)
                 {
-                    string deletableImageUrl = Path.Combine(folderPath, image.ImageUrl);
-                    ExtensionMethods.DeleteFile(deletableImageUrl);
+                   await _cloudinaryService.FileDeleteAsync(image.ImageUrl);
                     existProduct.ProductImages.Remove(image);
                 }
             }
             foreach (var image in vm.Images ?? [])
             {
-                string ImageFileUrl = await image.SaveFileAsync(folderPath);
+                string ImageFileUrl = await _cloudinaryService.FileUploadAsync(image);
                 ProductImage productImage = new()
                 {
                     ImageUrl = ImageFileUrl,
@@ -277,18 +274,15 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             var product = await _context.Products.Include(x=>x.ProductImages).FirstOrDefaultAsync();
             if (product is null) return NotFound();
             _context.Products.Remove(product);
+
             await _context.SaveChangesAsync();
 
-            string folderUrl = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
-            string hoverImageUrl = Path.Combine(folderUrl, product.HoverImageUrl);
-            string mainImageUrl = Path.Combine(folderUrl, product.MainImageUrl);
+            await _cloudinaryService.FileDeleteAsync(product.MainImageUrl);
+            await _cloudinaryService.FileDeleteAsync(product.HoverImageUrl);
 
-            ExtensionMethods.DeleteFile(hoverImageUrl);
-            ExtensionMethods.DeleteFile(mainImageUrl);
             foreach (var image in product.ProductImages)
             {
-                string imageUrl=Path.Combine(folderUrl, image.ImageUrl);
-                ExtensionMethods.DeleteFile(imageUrl);
+                await _cloudinaryService.FileDeleteAsync(image.ImageUrl);
             }
             return RedirectToAction(nameof(Index));
         }

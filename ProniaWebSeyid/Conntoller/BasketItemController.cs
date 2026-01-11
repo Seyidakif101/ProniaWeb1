@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace ProniaWebSeyid.Conntoller
 {
     [Authorize]
-    public class BasketItemController(AppDbContext _context, UserManager<AppUser> _userManager, SignInManager<AppUser> _signInManager,IBasketService _service) : Controller
+    public class BasketItemController(AppDbContext _context,IBasketService _service) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -21,7 +21,7 @@ namespace ProniaWebSeyid.Conntoller
         public async Task<IActionResult> AddToBasket(int productId)
         {
             var isExistProduct=await _context.Products.AnyAsync(x=>x.Id==productId);
-            if (isExistProduct == null)
+            if (!isExistProduct)
             {
                 return NotFound();
             }
@@ -61,7 +61,7 @@ namespace ProniaWebSeyid.Conntoller
         {
 
             var isExistProduct = await _context.Products.AnyAsync(x => x.Id == productId);
-            if (isExistProduct == null)
+            if (!isExistProduct)
             {
                 return NotFound();
             }
@@ -106,17 +106,44 @@ namespace ProniaWebSeyid.Conntoller
             }
             if (basketItem.Count > 1)
             {
-                basketItem.Count -= 1;
+                basketItem.Count--;
             }
             _context.BasketItems.Update(basketItem);
             await _context.SaveChangesAsync();
-            string? returnUrl = Request.Headers["Referer"];
-            if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return RedirectToAction("Index");
+
+            var basketItems = await _service.GetBasketItemsAsync();
+            return PartialView("_BasketPartialView", basketItems);
 
         }
+        public async Task<IActionResult> IncreaseBasketItemCount(int productId)
+        {
+            var isExistProduct = await _context.Products.AnyAsync(x => x.Id == productId);
+            if (!isExistProduct)
+            {
+                return NotFound();
+            }
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var isExistUser = await _context.Users.AnyAsync(x => x.Id == userId);
+            if (!isExistUser)
+            {
+                return BadRequest();
+            }
+            var basketItem = await _context.BasketItems.FirstOrDefaultAsync(x => x.AppUserId == userId && x.ProductId == productId);
+            if (basketItem is null)
+            {
+                return NotFound();
+            }
+
+                basketItem.Count++;
+            
+            _context.BasketItems.Update(basketItem);
+            await _context.SaveChangesAsync();
+
+            var basketItems = await _service.GetBasketItemsAsync();
+            return PartialView("_BasketPartialView", basketItems);
+
+        }
+
+
     }
 }

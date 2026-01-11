@@ -1,4 +1,5 @@
-﻿using ProniaWebSeyid.Helpers;
+﻿using ProniaWebSeyid.Abstraction;
+using ProniaWebSeyid.Helpers;
 using ProniaWebSeyid.Models;
 using ProniaWebSeyid.ViewModels.ShippingViewModels;
 using ProniaWebSeyid.ViewModels.TagViewModels;
@@ -7,7 +8,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AutoValidateAntiforgeryToken]
-    public class ShippingController(AppDbContext _context, IWebHostEnvironment _environment) : Controller
+    public class ShippingController(AppDbContext _context, IWebHostEnvironment _environment,ICloudinaryService _cloudinaryService) : Controller
     {
 
         public async Task<IActionResult> Index()
@@ -43,10 +44,7 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
                 ModelState.AddModelError("MainImage", "File olcusu maksimum 2MB ola biler!");
                 return View(svm);
             }
-            string ImageFileName = Guid.NewGuid().ToString() + svm.Image.FileName;
-            string ImageUrl = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images", ImageFileName);
-            using FileStream Stream = new(ImageUrl, FileMode.Create);
-            await svm.Image.CopyToAsync(Stream);
+            string ImageFileName =await _cloudinaryService.FileUploadAsync(svm.Image);
             Shipping shipping = new()
             {
                 Name = svm.Name,
@@ -65,13 +63,9 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             if (shipping is null) return NotFound();
             _context.Shippings.Remove(shipping);
             await _context.SaveChangesAsync();
-            string folderUrl = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
-            string ImageUrl = Path.Combine(folderUrl, shipping.ImageUrl);
 
-            if (System.IO.File.Exists(ImageUrl))
-            {
-                System.IO.File.Delete(ImageUrl);
-            }
+           await _cloudinaryService.FileDeleteAsync(shipping.ImageUrl);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -111,13 +105,10 @@ namespace ProniaWebSeyid.Areas.Admin.Controllers
             existShipping.Name = vm.Name;
             existShipping.Description = vm.Description;
             existShipping.ImageUrl = vm.ImageUrl;
-            string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
+            //string folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "website-images");
             if (vm.Image is { })
             {
-                string newImage = await vm.Image.SaveFileAsync(folderPath);
-                string existImage = Path.Combine(folderPath, existShipping.ImageUrl);
-
-                ExtensionMethods.DeleteFile(existImage);
+                string newImage = await _cloudinaryService.FileUploadAsync(vm.Image);   
                 existShipping.ImageUrl = newImage;
             }
             _context.Shippings.Update(existShipping);
